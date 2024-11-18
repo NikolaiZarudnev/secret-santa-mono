@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -25,38 +26,22 @@ class UserRepository extends ServiceEntityRepository
         ;
     }
 
-    public function getIds(): array
+    public function allSetRandomNumber(): void
     {
-        return $this->createQueryBuilder('u')
-            ->select('u.id')
-            ->getQuery()
-            ->getScalarResult()
-        ;
-    }
+        $count = $this->getCount();
 
-    public function setReceiverNull(): void
-    {
-        $this->createQueryBuilder('u')
-            ->update(User::class, 'u')
-            ->set('u.receiver', null)
-            ->getQuery()
+        $sql = 'UPDATE user u SET u.serial_number = FLOOR(RAND() * :salt)';
+        $this->getEntityManager()
+            ->createNativeQuery($sql, new ResultSetMapping())
+            ->setParameter(':salt', $count * $count)
             ->execute()
         ;
     }
 
-    public function getCountWithoutReceiver()
+    public function findPartialOrderBySerialNumber(int $limit, int $offset)
     {
         return $this->createQueryBuilder('u')
-            ->select('COUNT(u.id)')
-            ->andWhere('u.receiver IS NULL')
-            ->getQuery()
-            ->getSingleScalarResult()
-        ;
-    }
-
-    public function findPartialUsers(int $limit, int $offset)
-    {
-        return $this->createQueryBuilder('u')
+            ->orderBy('u.serialNumber', 'ASC')
             ->setFirstResult($offset)
             ->setMaxResults($limit)
             ->getQuery()

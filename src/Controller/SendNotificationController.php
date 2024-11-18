@@ -20,21 +20,12 @@ class SendNotificationController extends AbstractController
     public function sendSecretSanta(): JsonResponse
     {
         try {
-            $this->santaPairsService->generatePairs();
+            $this->santaPairsService->generateNumbers();
         } catch (BadRequestException $e) {
             return new JsonResponse(
                 data: ['error' => $e->getMessage()],
                 status: Response::HTTP_BAD_REQUEST
             );
-        } catch (\Exception $e) {
-            return new JsonResponse(
-                data: ['error' => $e->getMessage()],
-                status: Response::HTTP_INTERNAL_SERVER_ERROR
-            );
-        }
-
-        try {
-            $this->santaPairsService->validatePairs();
         } catch (\Exception $e) {
             return new JsonResponse(
                 data: ['error' => $e->getMessage()],

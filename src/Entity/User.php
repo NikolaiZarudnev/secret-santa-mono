@@ -33,8 +33,8 @@ class User implements UserInterface
     #[ORM\Column(length: 180)]
     private ?string $lastName = null;
 
-    #[ORM\OneToOne(targetEntity: self::class, cascade: ['persist', 'remove'])]
-    private ?self $receiver = null;
+    #[ORM\Column(nullable: true)]
+    private ?int $serialNumber = null;
 
     public function getId(): ?int
     {
@@ -132,14 +132,14 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getReceiver(): ?self
+    public function getSerialNumber(): ?int
     {
-        return $this->receiver;
+        return $this->serialNumber;
     }
 
-    public function setReceiver(?self $receiver): static
+    public function setSerialNumber(?int $serialNumber): static
     {
-        $this->receiver = $receiver;
+        $this->serialNumber = $serialNumber;
 
         return $this;
     }
