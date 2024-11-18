@@ -16,4 +16,51 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
+    public function getCount()
+    {
+        return $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->getQuery()
+            ->getSingleScalarResult()
+        ;
+    }
+
+    public function getIds(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->select('u.id')
+            ->getQuery()
+            ->getScalarResult()
+        ;
+    }
+
+    public function setReceiverNull(): void
+    {
+        $this->createQueryBuilder('u')
+            ->update(User::class, 'u')
+            ->set('u.receiver', null)
+            ->getQuery()
+            ->execute()
+        ;
+    }
+
+    public function getCountWithoutReceiver()
+    {
+        return $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->andWhere('u.receiver IS NULL')
+            ->getQuery()
+            ->getSingleScalarResult()
+        ;
+    }
+
+    public function findPartialUsers(int $limit, int $offset)
+    {
+        return $this->createQueryBuilder('u')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }
