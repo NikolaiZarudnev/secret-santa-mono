@@ -1,0 +1,42 @@
+version: '3'
+services:
+    nginx:
+        image: nginx:latest
+        ports:
+            - "81:80"
+            - "444:443"
+        volumes:
+            - ./docker/nginx/conf:/etc/nginx/conf.d
+            - ./:/var/www/secret-santa
+            - ./docker/logs/nginx:/var/log/nginx
+        links:
+            - php
+    php:
+        build: ./docker/php
+        links:
+            - mysql
+        volumes:
+            - ./:/var/www/secret-santa
+        environment:
+            DATABASE_URL: mysql://user:user@mysql/secret-santa?serverVersion=8.0.36
+    mysql:
+        image: mysql:8.0
+        deploy:
+            restart_policy:
+                condition: any
+        ports:
+            - "3307:3306"
+        volumes:
+            - ./docker/mysql/data:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: secret-santa
+            MYSQL_USER: user
+            MYSQL_PASSWORD: user
+    rabbitmq:
+        image: rabbitmq:3.10-management
+        ports:
+            - '5673:5672'
+            - '15673:15672'
+        volumes:
+            - ./docker/rabbitmq/data/:/var/lib/rabbitmq/
